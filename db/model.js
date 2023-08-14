@@ -9,7 +9,7 @@ const selectAllTopics = () => {
 
 const selectAllEndpoints = async () => {
     try {
-    const endpointsInfo = await fs.readFile('/Users/amybaker/Northcoders/backend/be-nc-news/endpoints.json', 'utf-8');
+    const endpointsInfo = await fs.readFile('endpoints.json', 'utf-8');
         const parsedEndpoints = JSON.parse(endpointsInfo);
     return parsedEndpoints;
 } catch (error) {
