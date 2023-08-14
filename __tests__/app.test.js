@@ -13,10 +13,15 @@ describe('/api/topics', () => {
         return request(app).get('/api/topics')
         .expect(200)
         .then((response) => {
-            const topic = response.body[0];
-            expect(topic).toHaveProperty('slug');
-            expect(topic).toHaveProperty('description');
-        });
+            const topics = response.body;
+            expect(topics).toEqual(expect.any(Array));
+            expect(topics.length).toEqual(3);
+
+            topics.forEach((topic) => {
+                expect(topic).toHaveProperty('slug');
+                expect(topic).toHaveProperty('description')
+            })     
+         });
    
     });
 });
