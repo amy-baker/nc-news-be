@@ -28,7 +28,7 @@ describe('/api/topics', () => {
 });
 
 describe('/api', () => {
-    test('GET: returns an object which describes all available endpoints on the API', () => {
+    test('GET 200: returns an object which describes all available endpoints on the API', () => {
         let convertEndpointsFile = fs.readFileSync('endpoints.json', 'utf-8');
         convertEndpointsFile = JSON.parse(convertEndpointsFile);
         const endpointsCount = Object.keys(convertEndpointsFile).length;
@@ -49,3 +49,37 @@ describe('/api', () => {
             })
         })
     })
+describe('/api/articles/:id', () => {
+    test('GET 200: responds with an article object with an id which corresponds to article_id at endpoint', () => {
+        return request(app)
+        .get('/api/articles/1')
+        .expect(200)
+        .then((response) => {
+        
+            let article = response.body.article 
+            expect(article).toBeInstanceOf(Object)
+            expect(article.author).toEqual("butter_bridge");
+            expect(article.title).toEqual("Living in the shadow of a great man");
+            expect(article.body).toEqual("I find this existence challenging");
+            expect(article).toHaveProperty('created_at');
+            expect(article).toHaveProperty('votes');
+            expect(article).toHaveProperty('article_img_url');
+        });
+    });
+    test('GET 400: responds with appropriate error message when given invalid id as input', () => {
+        return request(app)
+        .get('/api/articles/bingus')
+        .expect(400)
+        .then((response) => {
+            expect(response.body.msg).toEqual('Invalid input')
+        })
+    })
+    test('GET 404: sends appropriate error message when given a valid but nonexistent id as input', () => {
+        return request(app)
+        .get('/api/articles/450')
+        .expect(404)
+        .catch((err) => {
+            expect(err.response.body.msg).toEqual("Article does not exist")
+        })
+    })
+})
