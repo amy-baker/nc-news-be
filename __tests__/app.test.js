@@ -3,6 +3,7 @@ const app = require('../db/app.js');
 const seed = require('../db/seeds/seed.js');
 const { articleData, commentData, topicData, userData } = require('../db/data/test-data/index.js');
 const request = require("supertest");
+const fs = require('fs');
 
 beforeEach(() => seed({ articleData, commentData, topicData, userData }));
 
@@ -25,3 +26,26 @@ describe('/api/topics', () => {
    
     });
 });
+
+describe('/api', () => {
+    test('GET: returns an object which describes all available endpoints on the API', () => {
+        let convertEndpointsFile = fs.readFileSync('endpoints.json', 'utf-8');
+        convertEndpointsFile = JSON.parse(convertEndpointsFile);
+        const endpointsCount = Object.keys(convertEndpointsFile).length;
+
+        return request(app).get('/api')
+        .expect(200)
+        .then((response) => {
+           const endpoints = response.body;
+           expect(endpoints).toEqual(expect.any(Object));
+           expect(Object.keys(endpoints).length).toEqual(endpointsCount);
+
+                for (let endpointInstance in endpoints) {
+                let endpoint = endpoints[endpointInstance]
+                expect(endpoint).toHaveProperty('description');
+                expect(endpoint).toHaveProperty("queries")
+                expect(endpoint).toHaveProperty('exampleResponse');
+                }
+            })
+        })
+    })
