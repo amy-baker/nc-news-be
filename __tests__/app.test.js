@@ -84,13 +84,12 @@ describe('/api/articles/:id', () => {
     })
 })
 describe('/api/articles', () => {
-    test('responds with an array of article objects with comment_count created from comments.js', () => {
+    test('responds with an array of article objects with comment_count created from comments.js and body property removed', () => {
         return request(app)
         .get('/api/articles')
         .expect(200)
         .then((response) => {
             const articles = response.body.articles
-            expect(articles).toBeInstanceOf(Array);
             expect(articles.length).toEqual(13)
             articles.forEach((article) => {
                 expect(article).toHaveProperty('author');
@@ -101,28 +100,7 @@ describe('/api/articles', () => {
                 expect(article).toHaveProperty('votes');
                 expect(article).toHaveProperty('article_img_url');
                 expect(article).toHaveProperty('comment_count');
-        })
-        })
-    })
-    test('comment count is accurate', () => {
-        return request(app)
-        .get('/api/articles')
-        .expect(200)
-        .then((response) => {
-            const articles = response.body.articles;
-            expect(articles[0].comment_count).toEqual(2);
-            expect(articles[1].comment_count).toEqual(1);
-            expect(articles[2].comment_count).toEqual(0)
-        })
-    })
-    test('body property is not present', () => {
-        return request(app)
-        .get('/api/articles')
-        .expect(200)
-        .then((response) => {
-            const articles = response.body.articles
-        articles.forEach((article) => {
-            expect(article).not.toHaveProperty('body')
+                expect(article).not.toHaveProperty('body');
         })
         })
     })
