@@ -50,7 +50,7 @@ describe('/api', () => {
         })
     })
 describe('/api/articles/:id', () => {
-    test('GET 200: responds with an article object with an id which corresponds to article_id at endpoint', () => {
+    test('GET 200: responds with an article object with required properties', () => {
         return request(app)
         .get('/api/articles/1')
         .expect(200)
@@ -71,16 +71,16 @@ describe('/api/articles/:id', () => {
         .get('/api/articles/bingus')
         .expect(400)
         .then((response) => {
-            expect(response.body.msg).toEqual('Invalid input')
+            expect(response.body.msg).toEqual('Bad Request')
         })
     })
-    test('GET 404: sends appropriate error message when given a valid but nonexistent id as input', () => {
+    test('GET 404: sends appropriate error message when given a valid but nonexistent id as input',() => {
         return request(app)
         .get('/api/articles/450')
         .expect(404)
         .catch((err) => {
-            expect(err.response.body.msg).toEqual("Article does not exist")
-        })
+            expect(err).toEqual('Article does not exist');
+          })
     })
 })
 describe('/api/articles', () => {
@@ -122,6 +122,7 @@ describe('/api/articles', () => {
         .expect(404)
         .catch((err) => {
             expect(err.response.body.msg).toEqual("Article does not exist")
+            
         })
     })
 })
@@ -167,7 +168,7 @@ describe('/api/articles/:article_id/comments', () => {
         .get('/api/articles/invalidid/comments')
         .expect(400)
         .catch((err) => {
-            expect(err.response.body.msg).toEqual("Invalid input")
+            expect(err.response.body.msg).toEqual("Bad Request")
         })
         })
     })

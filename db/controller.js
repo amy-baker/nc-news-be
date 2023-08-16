@@ -24,15 +24,11 @@ const getAllEndpoints = (req, res, next) => {
 const getArticleById = (req, res, next) => {
     const { article_id } = req.params;
 
-    if ( isNaN(article_id)) {
-        return res.status(400).send({msg: 'Invalid input'})
-    }
     selectArticleById(article_id)
     .then((article) => {
         res.status(200).send({article})
     })
     .catch((err) => {
-
         next(err)
     });
 };
@@ -51,9 +47,7 @@ const getAllArticles = (req, res, next) => {
 const getCommentsById = (req, res, next) => {
     
     const { article_id } = req.params;
-    if ( isNaN(article_id)) {
-        return res.status(400).send({msg: 'Invalid input'})
-    }
+    
     selectCommentsById(article_id)
     .then((result) => {
         
