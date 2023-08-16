@@ -1,4 +1,4 @@
-const {selectAllTopics, selectArticleById, selectAllArticles } = require('./model.js')
+const {selectAllTopics, selectArticleById, selectAllArticles, selectCommentsById } = require('./model.js')
 const fs = require('fs');
 
 const getAllTopics = (req, res, next) => {
@@ -24,15 +24,11 @@ const getAllEndpoints = (req, res, next) => {
 const getArticleById = (req, res, next) => {
     const { article_id } = req.params;
 
-    if ( isNaN(article_id)) {
-        return res.status(400).send({msg: 'Invalid input'})
-    }
     selectArticleById(article_id)
     .then((article) => {
         res.status(200).send({article})
     })
     .catch((err) => {
-
         next(err)
     });
 };
@@ -48,4 +44,18 @@ const getAllArticles = (req, res, next) => {
     })
 }
 
-module.exports = {getAllTopics, getAllEndpoints, getArticleById, getAllArticles}
+const getCommentsById = (req, res, next) => {
+    
+    const { article_id } = req.params;
+    
+    selectCommentsById(article_id)
+    .then((result) => {
+        
+        res.status(200).send(result)
+    })
+    .catch((err) => {
+        next(err)
+    })
+}
+
+module.exports = {getAllTopics, getAllEndpoints, getArticleById, getAllArticles, getCommentsById}
