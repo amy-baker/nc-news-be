@@ -324,7 +324,7 @@ describe('/api/articles/:article_id/comments', () => {
             return request(app)
             .delete('/api/comments/1')
             .expect(204)
-            .then((response) => {
+            .then(() => {
     
                 return request(app)
                 .get('/api/comments/1')
