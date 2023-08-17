@@ -318,3 +318,33 @@ describe('/api/articles/:article_id/comments', () => {
         })
     })
     })
+
+    describe('DELETE /api/comments/:comment_id', () => {
+        test('204 - deletes comment with corresponding id', () => {
+            return request(app)
+            .delete('/api/comments/1')
+            .expect(204)
+            .then(() => {
+    
+                return request(app)
+                .get('/api/comments/1')
+                .expect(404)
+            })
+        })
+        test('404 - repsonds with appropriate error message when passed a valid id that is not attached to any comment', () => {
+            return request(app)
+            .delete('/api/comments/7828')
+            .expect(404)
+            .then((response) => {
+                expect(response.body.msg).toEqual('Not Found')
+            })
+        })
+        test('400 - responds with appropriate error message when passed an invalid id', () => {
+            return request(app)
+            .delete('/api/comments/thirty')
+            .expect(400)
+            .then((response) => {
+                expect(response.body.msg).toEqual('Bad Request')
+            })
+        })
+    })
