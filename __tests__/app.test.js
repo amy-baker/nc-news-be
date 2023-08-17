@@ -309,4 +309,12 @@ describe('/api/articles/:article_id/comments', () => {
                 expect(response.body.msg).toEqual('Bad Request')
             })
         })
+        test('400 - responds with appropriate error message when unexpected object is passed',() => {
+            return request(app)
+            .patch('/api/articles/1')
+            .send( {inc_votes: "beep beep"})
+        .then((response) => {
+            expect(response.body.msg).toEqual('Bad Request')
+        })
+    })
     })

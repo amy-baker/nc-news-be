@@ -79,7 +79,7 @@ const insertComment = (id, username, body) => {
   })
 }
 const castVotes = (id, inc_votes) => {
-    if (inc_votes === undefined) {
+    if (inc_votes === undefined || isNaN(inc_votes)) {
         return Promise.reject({ status: 400, msg: 'Bad Request'
         })
     }
