@@ -185,6 +185,18 @@ describe('/api/articles/:article_id/comments', () => {
                 expect(comment.author).toBe("butter_bridge")
             })
         })
+        test('ignores unnecessary properties', () => {
+            return request(app)
+            .post('/api/articles/3/comments')
+            .send({ username: "butter_bridge", body: "comment example", rogueProp: ";)"})
+            .expect(201)
+            .then((response) => {
+                const comment = response.body.comment
+                
+                expect(comment.body).toBe('comment example')
+                expect(comment.author).toBe("butter_bridge")
+            })
+        })
         test('POST 400: responds with appropriate error message when attempt is made on an article with an invalid id', () => {
             return request(app)
             .post('/api/articles/jerryjeans/comments')
