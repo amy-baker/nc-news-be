@@ -1,6 +1,5 @@
 const db = require('./connection.js')
 
-
 const selectAllTopics = () => {
     return db.query(`SELECT * FROM topics;`).then((result) => {
         return result.rows;
@@ -79,5 +78,23 @@ const insertComment = (id, username, body) => {
     })
   })
 }
+const castVotes = (id, inc_votes) => {
+    if (inc_votes === undefined) {
+        return Promise.reject({ status: 400, msg: 'Bad Request'
+        })
+    }
+  
+    return db.query(
+        `UPDATE articles SET votes = votes + $1 WHERE article_id = $2 RETURNING *`,
+        [inc_votes, id])
  
-module.exports = { selectAllTopics, selectArticleById, selectAllArticles, selectCommentsById, insertComment}
+    .then((result) => {
+        if (result.rows.length === 0) {
+            return Promise.reject({ status: 404, msg: 'Not Found' });
+        }
+        return result.rows[0];
+    })
+};
+
+ 
+module.exports = { selectAllTopics, selectArticleById, selectAllArticles, selectCommentsById, insertComment, castVotes}

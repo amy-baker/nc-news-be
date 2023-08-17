@@ -244,3 +244,69 @@ describe('/api/articles/:article_id/comments', () => {
             })
         })
      })
+
+     describe('PATCH /api/articles/:article_id/', () => {
+        test('returns with a modified article object with votes property updated', () => {
+            return request(app)
+            .patch('/api/articles/1')
+            .send( {inc_votes : 7})
+            .expect(200)
+            .then((response) => {
+                const article = response.body
+                expect(article.article_id).toEqual(1)
+                expect(article.votes).toEqual(107)
+                expect(article).toHaveProperty('author')
+                expect(article).toHaveProperty('title');
+                expect(article).toHaveProperty('article_id');
+                expect(article).toHaveProperty('topic');
+                expect(article).toHaveProperty('created_at');
+                expect(article).toHaveProperty('votes');
+                expect(article).toHaveProperty('article_img_url'); 
+                expect(article).toHaveProperty('body')
+            })
+        })
+        test('is able to decrement votes', () => {
+            return request(app)
+            .patch('/api/articles/1')
+            .send( {inc_votes: -2})
+            .expect(200)
+            .then((response) => {
+                expect(response.body.votes).toEqual(98)
+            })
+        })
+        test('ignores unnecessary properties', () => {
+            return request(app)
+            .patch('/api/articles/1')
+            .send( {inc_votes: 2, rogueProp: 'B)'})
+            .expect(200)
+            .then((response) => {
+                expect(response.body.votes).toEqual(102)
+            })
+        })
+        test('404 - responds with appropriate error message when attempt is made on an article with a valid but nonexistent id', () => {
+            return request(app)
+            .patch('/api/articles/820')
+            .send( { inc_votes: 222 })
+            .expect(404)
+            .then((response) => {
+                expect(response.body.msg).toEqual('Not Found')
+            })
+        })
+        test('400 - responds with appropriate error message when attempt is made on an article with an invalid id', () => {
+            return request(app)
+            .patch('/api/articles/rick')
+            .send( {inc_votes: 7})
+            .expect(400)
+            .then((response) => {
+                expect(response.body.msg).toEqual('Bad Request')
+            })
+        })
+        test('400 - responds with appropriate error message when object with missing properties is passed', () => {
+            return request(app)
+            .patch('/api/articles/1')
+            .send( {})
+            .then((response) => {
+                expect(response.body.msg).toEqual('Bad Request')
+            })
+        })
+    })
