@@ -107,5 +107,11 @@ const removeCommentById = (id) => {
             }
         })
 }
+
+const selectAllUsers = () => {
+    return db.query(`SELECT * FROM users;`).then((result) => {
+        return result.rows;
+    })
+}
  
-module.exports = { selectAllTopics, selectArticleById, selectAllArticles, selectCommentsById, insertComment, castVotes, removeCommentById}
+module.exports = { selectAllTopics, selectArticleById, selectAllArticles, selectCommentsById, insertComment, castVotes, removeCommentById, selectAllUsers}
