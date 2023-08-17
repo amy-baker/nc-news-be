@@ -79,7 +79,7 @@ describe('/api/articles/:id', () => {
         .get('/api/articles/450')
         .expect(404)
         .catch((err) => {
-            expect(err).toEqual('Article does not exist');
+            expect(err).toEqual('Not Found');
           })
     })
 })
@@ -121,7 +121,7 @@ describe('/api/articles', () => {
         .get('/api/articles/450')
         .expect(404)
         .catch((err) => {
-            expect(err.response.body.msg).toEqual("Article does not exist")
+            expect(err.response.body.msg).toEqual("Not Found")
             
         })
     })
@@ -160,7 +160,7 @@ describe('/api/articles/:article_id/comments', () => {
         .get('/api/articles/4206/comments')
         .expect(404)
         .then((response) => {
-            expect(response.body.msg).toEqual('Article does not exist')
+            expect(response.body.msg).toEqual('Not Found')
         })
     })
     test('GET 400: returns appropriate error message when invalid id is passed', () => {
@@ -172,3 +172,63 @@ describe('/api/articles/:article_id/comments', () => {
         })
         })
     })
+    describe('POST /api/articles/:article_id/comments', () => {
+        test ('POST 201:adds comment object for articles', () => {
+            return request(app)
+            .post('/api/articles/3/comments')
+            .send({ username: "butter_bridge", body: "comment example"})
+            .expect(201)
+            .then((response) => {
+                const comment = response.body.comment
+                
+                expect(comment.body).toBe('comment example')
+                expect(comment.author).toBe("butter_bridge")
+            })
+        })
+        test('POST 400: responds with appropriate error message when attempt is made on an article with an invalid id', () => {
+            return request(app)
+            .post('/api/articles/jerryjeans/comments')
+            .send({ username: "butter_bridge", body: "comment example"})
+            .expect(400)
+            .catch((err) => {
+                expect(err.response).toEqual('Invalid article id')
+            })
+    
+            })
+            test('POST 404: responds with appropriate error message when attempt is made with a valid id that doesnt correspond to any article', () => {
+                return request(app)
+                .post('/api/articles/6000/comments')
+                .send({ username: "butter_bridge", body: "comment example"})
+                .expect(404)
+                .catch((err) => {
+                    expect(err.response).toEqual('Not Found')
+                })
+        })
+        test('POST 404: responds with appropriate error message when no user attached to username', () => {
+            return request(app)
+            .post('/api/articles/3/comments')
+            .send({ username: 'amy', body: 'test!!!'})
+        .expect(404)
+        .then((response) => {
+            expect(response.body.msg).toEqual('User not found')
+        })
+    })
+        test('POST 400: responds with appropriate error message when no body is passed in', () => {
+            return request(app)
+            .post('/api/articles/3/comments')
+            .send({ username: "butter_bridge" })
+            .expect(400)
+            .then((response) => {
+                expect(response.body.msg).toEqual('Missing username or body')
+            })
+        })
+        test('POST 400: responds with appropriate error message when no username passed in', () => {
+            return request(app)
+            .post('/api/articles/3/comments')
+            .send({ body: "test comment" })
+            .expect(400)
+            .then((response) => {
+                expect(response.body.msg).toEqual('Missing username or body')
+            })
+        })
+     })

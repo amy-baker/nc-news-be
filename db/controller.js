@@ -1,4 +1,4 @@
-const {selectAllTopics, selectArticleById, selectAllArticles, selectCommentsById } = require('./model.js')
+const {selectAllTopics, selectArticleById, selectAllArticles, selectCommentsById, insertComment } = require('./model.js')
 const fs = require('fs');
 
 const getAllTopics = (req, res, next) => {
@@ -58,4 +58,18 @@ const getCommentsById = (req, res, next) => {
     })
 }
 
-module.exports = {getAllTopics, getAllEndpoints, getArticleById, getAllArticles, getCommentsById}
+const postComment = (req, res, next) => {
+    const { article_id } = req.params;
+    const { username, body } = req.body;
+   
+    insertComment(article_id, username, body)
+    .then((comment) => {
+        
+        res.status(201).send({comment})
+    })
+    .catch((err) => {
+        next(err)
+    })
+}
+
+module.exports = {getAllTopics, getAllEndpoints, getArticleById, getAllArticles, getCommentsById, postComment}

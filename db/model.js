@@ -44,10 +44,40 @@ const selectCommentsById = (id) => {
    .then((result) => {
 
     if (result.rows.length === 0) {
-        return Promise.reject({status: 404, msg: "Article does not exist"})
+        return Promise.reject({status: 404, msg: "Not Found"})
     } else {
     return result.rows
     }
    })
 }
-module.exports = { selectAllTopics, selectArticleById, selectAllArticles, selectCommentsById}
+
+const insertComment = (id, username, body) => {
+  if (username === undefined|| body === undefined) {
+    return Promise.reject({
+    status: 400,
+    msg: 'Missing username or body'
+    })
+  } 
+  return db.query(`SELECT * FROM users WHERE username = $1`, [username])
+  .then((result) => {
+     if (result.rows.length === 0) {
+    return Promise.reject({
+    status: 404, msg: 'User not found'
+          });
+      }
+
+    return selectArticleById(id) 
+    .then(() => {
+        return db.query(
+            `INSERT INTO comments (body, author, article_id) VALUES ($1, $2, $3) RETURNING *;`,
+            [body, username, id]
+        );
+    })
+    .then((result) => {
+       
+        return result.rows[0];
+    })
+  })
+}
+ 
+module.exports = { selectAllTopics, selectArticleById, selectAllArticles, selectCommentsById, insertComment}
