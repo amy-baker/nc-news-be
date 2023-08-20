@@ -19,24 +19,48 @@ const selectArticleById = (id) => {
     });
 };
 
-const selectAllArticles = () => {
-    return db.query(`SELECT articles.article_id, articles.title, articles.topic, articles.author,
-    articles.created_at, articles.votes, articles.article_img_url,
-    CAST(COUNT(comments.article_id) AS INTEGER) 
-    AS comment_count
-    FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id
-    
-    GROUP BY articles.article_id
-    ORDER BY articles.created_at DESC`)
-    .then((result) => {
+const selectAllArticles = (topic, sort_by = 'created_at', order = 'desc') => {
+    const validColumns = ['title', 'topic', 'author', 'body', 'created_at', 'votes', 'article_img_url', 'comment_count'];
+    const validOrder = ['asc', 'desc'];
+  
+    if (!validColumns.includes(sort_by)) {
+      return Promise.reject({ status: 400, msg: 'Bad Request' });
+    }
+  
+    if (!validOrder.includes(order)) {
+      return Promise.reject({ status: 400, msg: 'Bad Request' });
+    }
+  
+    const values = [];
+    let query = `
+      SELECT articles.article_id, articles.title, articles.topic, articles.author,
+      articles.created_at, articles.votes, articles.article_img_url,
+      CAST(COUNT(comments.article_id) AS INTEGER) 
+      AS comment_count
+      FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id
+    `;
+  
+    if (topic) {
+      query += `WHERE topic = $${values.length + 1}`;
+      values.push(topic);
+    }
+  
+    query += `
+      GROUP BY articles.article_id
+      ORDER BY ${sort_by} ${order}
+    `;
+  
+    return db.query(query, values)
+      .then((result) => {
         if (result.rows.length === 0) {
-            return Promise.reject({status: 404, msg: "No articles found"});
+          return Promise.reject({ status: 404, msg: 'Not Found' });
         } else {
-            return result
-        };
-    });
-}
+          return result.rows;
+        }
+      });
+  };
 
+  
 const selectCommentsById = (id) => {
 
    return db.query(`SELECT * FROM comments WHERE article_id = $1 ORDER BY created_at DESC`, [id])

@@ -89,8 +89,7 @@ describe('/api/articles', () => {
         .get('/api/articles')
         .expect(200)
         .then((response) => {
-            const articles = response.body.articles
-            
+            const articles = response.body
             expect(articles.length).toEqual(13)
             articles.forEach((article) => {
                 expect(article).toHaveProperty('author');
@@ -111,7 +110,7 @@ describe('/api/articles', () => {
        .get('/api/articles')
        .expect(200)
        .then((response) => {
-            expect(response.body.articles).toBeSortedBy('created_at', {
+            expect(response.body).toBeSortedBy('created_at', {
                 descending: true
             });
        })
@@ -364,6 +363,53 @@ describe('/api/articles/:article_id/comments', () => {
                     expect(user).toHaveProperty('name');
                     expect(user).toHaveProperty('avatar_url');
                 })
+            })
+        })
+    })
+    describe('FEATURE: get/api/articles (queries)', () => {
+        test('responds with articles filtered by specified topic', () => {
+            return request(app)
+            .get('/api/articles?topic=mitch')
+            .expect(200)
+            .then((response) => {
+                const articles = response.body
+                expect(articles.length).toEqual(12)
+                articles.forEach((article) => {
+                    expect(article.topic === 'mitch').toEqual(true)
+                })
+            })
+        })
+        test('repsonds with articles sorted by valid columns in either ascending or descending order', () => {
+            return request(app)
+            .get('/api/articles?sort_by=comment_count&order=asc')
+            .expect(200)
+            .then((response) => {
+                const articles = response.body
+                expect(articles).toBeSortedBy("comment_count", { ascending: true})
+            })
+        })
+        test('should return appropriate error message if given invalid sort query', () => {
+            return request(app)
+            .get('/api/articles?sort_by=secretstuff')
+            .expect(400)
+            .then((response) => {
+                expect(response.body.msg).toEqual('Bad Request')
+            })
+        })
+        test('should return appropriate error message if given invalid order query', () => {
+            return request(app)
+            .get('/api/articles?sort_by=comment_count&order=sideways')
+            .expect(400)
+            .then((response) => {
+                expect(response.body.msg).toEqual('Bad Request')
+            })
+        })
+        test('returns appropriate error message if specified topic does not exist', () => {
+            return request(app)
+            .get('/api/articles?topic=funhats')
+            .expect(404)
+            .then((response) => {
+                expect(response.body.msg).toEqual('Not Found')
             })
         })
     })
