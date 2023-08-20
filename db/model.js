@@ -1,4 +1,16 @@
 const db = require('./connection.js')
+const fs = require('fs/promises');
+
+const selectAllEndpoints = () => {
+  return fs.readFile("./endpoints.json", "utf-8")
+  .then((contents) => {
+    const endpointsInfo = JSON.parse(contents);
+    return endpointsInfo
+  })
+  .catch((err) => {
+    next(err)
+  })
+}
 
 const selectAllTopics = () => {
     return db.query(`SELECT * FROM topics;`).then((result) => {
@@ -138,4 +150,4 @@ const selectAllUsers = () => {
     })
 }
  
-module.exports = { selectAllTopics, selectArticleById, selectAllArticles, selectCommentsById, insertComment, castVotes, removeCommentById, selectAllUsers}
+module.exports = { selectAllEndpoints, selectAllTopics, selectArticleById, selectAllArticles, selectCommentsById, insertComment, castVotes, removeCommentById, selectAllUsers}

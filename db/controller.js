@@ -1,5 +1,16 @@
-const {selectAllTopics, selectArticleById, selectAllArticles, selectCommentsById, insertComment, castVotes, removeCommentById, selectAllUsers } = require('./model.js')
+const {selectAllEndpoints, selectAllTopics, selectArticleById, selectAllArticles, selectCommentsById, insertComment, castVotes, removeCommentById, selectAllUsers } = require('./model.js')
 const fs = require('fs');
+
+const getAllEndpoints = (req, res, next) => {
+  selectAllEndpoints()
+  .then((endpoints) => {
+    res.status(200).send({endpoints})
+  })
+  .catch((err) => {
+    next(err)
+  })
+}
+
 
 const getAllTopics = (req, res, next) => {
     selectAllTopics().then((data) => {
@@ -9,18 +20,6 @@ const getAllTopics = (req, res, next) => {
         next(err)
     })
 }
-
-const getAllEndpoints = (req, res, next) => {
-    fs.promises.readFile('endpoints.json', 'utf-8')
-    .then(endpointsInfo => {
-        const parsedEndpoints = JSON.parse(endpointsInfo);
-        res.status(200).send(parsedEndpoints)
-    })
-    .catch((err) => {
-        next(err)
-    })
-}
-
 const getArticleById = (req, res, next) => {
     const { article_id } = req.params;
 
