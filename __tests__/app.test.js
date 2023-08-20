@@ -36,7 +36,7 @@ describe('/api', () => {
         return request(app).get('/api')
         .expect(200)
         .then((response) => {
-           const endpoints = response.body;
+           const { endpoints }= response.body;
            expect(endpoints).toEqual(expect.any(Object));
            expect(Object.keys(endpoints).length).toEqual(endpointsCount);
 
