@@ -78,14 +78,13 @@ const selectCommentsById = (id) => {
 
    return db.query(`SELECT * FROM comments WHERE article_id = $1 ORDER BY created_at DESC`, [id])
    .then((result) => {
-
-    if (result.rows.length === 0) {
-        return Promise.reject({status: 404, msg: "Not Found"})
-    } else {
     return result.rows
-    }
-   })
-}
+    })
+    .catch((error) => {
+      return Promise.reject({ status: 500, msg: "Internal Server Error" }); 
+    })
+   }
+
 
 const insertComment = (id, username, body) => {
   if (username === undefined|| body === undefined) {
